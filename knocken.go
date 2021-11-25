@@ -70,8 +70,8 @@ func recordMetrics(URLs URL) {
 					}
 					htmlOld, err := getContentOfFileIfExists(target)
 
+					writeFile(target, htmlNew)
 					if err != nil {
-						writeFile(target, htmlNew)
 						continue
 					}
 					htmlNewStr := string(htmlNew)
