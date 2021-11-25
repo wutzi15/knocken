@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  knocken:
+    build: .
+    ports:
+      - 9101:9101
+    restart: always
