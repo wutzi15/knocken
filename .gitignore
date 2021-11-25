@@ -1,3 +1,8 @@
+
+# Created by https://www.toptal.com/developers/gitignore/api/go
+# Edit at https://www.toptal.com/developers/gitignore?templates=go
+
+### Go ###
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -14,139 +19,8 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+### Go Patch ###
+/vendor/
+/Godeps/
 
-# Created by https://www.toptal.com/developers/gitignore/api/autotools,c++,cmake,autotools+strict
-# Edit at https://www.toptal.com/developers/gitignore?templates=autotools,c++,cmake,autotools+strict
-
-### Autotools ###
-# http://www.gnu.org/software/automake
-
-Makefile.in
-/ar-lib
-/mdate-sh
-/py-compile
-/test-driver
-/ylwrap
-.deps/
-.dirstamp
-
-# http://www.gnu.org/software/autoconf
-
-autom4te.cache
-/autoscan.log
-/autoscan-*.log
-/aclocal.m4
-/compile
-/config.cache
-/config.guess
-/config.h.in
-/config.log
-/config.status
-/config.sub
-/configure
-/configure.scan
-/depcomp
-/install-sh
-/missing
-/stamp-h1
-
-# https://www.gnu.org/software/libtool/
-
-/ltmain.sh
-
-# http://www.gnu.org/software/texinfo
-
-/texinfo.tex
-
-# http://www.gnu.org/software/m4/
-
-m4/libtool.m4
-m4/ltoptions.m4
-m4/ltsugar.m4
-m4/ltversion.m4
-m4/lt~obsolete.m4
-
-# Generated Makefile
-# (meta build system like autotools,
-# can automatically generate from config.status script
-# (which is called by configure script))
-Makefile
-
-### Autotools Patch ###
-
-### Autotools+strict ###
-# http://www.gnu.org/software/automake
-
-
-# http://www.gnu.org/software/autoconf
-
-
-# https://www.gnu.org/software/libtool/
-
-
-# http://www.gnu.org/software/texinfo
-
-
-# http://www.gnu.org/software/m4/
-
-
-# Generated Makefile
-# (meta build system like autotools,
-# can automatically generate from config.status script
-# (which is called by configure script))
-
-### Autotools+strict Patch ###
-# Generated source files
-configure
-
-### C++ ###
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-### CMake ###
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-
-### CMake Patch ###
-# External projects
-*-prefix/
-
-# End of https://www.toptal.com/developers/gitignore/api/autotools,c++,cmake,autotools+strict
+# End of https://www.toptal.com/developers/gitignore/api/go
