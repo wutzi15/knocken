@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -51,7 +52,7 @@ func getContentOfFileIfExists(fileName string) ([]byte, error) {
 	return ioutil.ReadFile("./html/" + fileName)
 }
 
-func recordMetrics(URLs URL) {
+func recordMetrics(URLs URL, saveDiff bool) {
 	go func() {
 		for {
 			// Read file to byte array
@@ -82,6 +83,9 @@ func recordMetrics(URLs URL) {
 					len2 := float64(len(htmlOldStr))
 					weightedLen := (len1 + len2) / 2.0
 					same := 1 - (levenshteinDiff / weightedLen)
+					if saveDiff {
+						writeFile(fmt.Sprint(same)+"_"+target, htmlNew)
+					}
 					fmt.Println(same)
 					statSame.WithLabelValues(target).Set(same)
 				}
@@ -94,6 +98,10 @@ func recordMetrics(URLs URL) {
 func main() {
 	// url := "https://imflow.me"
 	fmt.Println("Starting...")
+
+	saveDiff := flag.Bool("saveDiffs", false, "Keep diffs in ./html/ with diff percentage")
+
+	flag.Parse()
 
 	data, err := ioutil.ReadFile("targets.yml")
 	if err != nil {
@@ -130,7 +138,7 @@ func main() {
 	}
 
 	prometheus.MustRegister(statSame)
-	recordMetrics(URLs)
+	recordMetrics(URLs, *saveDiff)
 
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(":9101", nil))
