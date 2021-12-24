@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -31,6 +32,7 @@ var (
 			"target",
 		},
 	)
+	verbose = false
 )
 
 func getHTML(url string) ([]byte, error) {
@@ -81,12 +83,35 @@ func recordMetrics(URLs URL, saveDiff bool) {
 					}
 					htmlNewStr := string(htmlNew)
 					htmlOldStr := string(htmlOld)
+					if htmlNewStr == htmlOldStr {
+						fmt.Printf("%s: %s\n", target, "Same")
+					}
+					//write string to file
+					fnew, err := os.Create("htmlNewStr.html")
+					if err != nil {
+						panic(err)
+					}
+					fnew.WriteString(htmlNewStr)
+					fnew.Sync()
+					fold, err := os.Create("htmlOldStr.html")
+					if err != nil {
+						panic(err)
+					}
+					fold.WriteString(htmlOldStr)
+					fold.Sync()
+
+					// if verbose {
+					// 	fmt.Printf("\nOld: %s\nNew: %s\n", htmlOldStr, htmlNewStr)
+					// }
 					diffs := dmp.DiffMain(htmlNewStr, htmlOldStr, false)
 					levenshteinDiff := float64(dmp.DiffLevenshtein(diffs))
 					len1 := float64(len(htmlNewStr))
 					len2 := float64(len(htmlOldStr))
 					weightedLen := (len1 + len2) / 2.0
 					same := 1 - (levenshteinDiff / weightedLen)
+					if verbose {
+						fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
+					}
 					if saveDiff {
 						writeFile(fmt.Sprint(same)+"_"+target, htmlNew)
 					}
@@ -104,8 +129,11 @@ func main() {
 	fmt.Println("Starting...")
 
 	saveDiff := flag.Bool("saveDiffs", false, "Keep diffs in ./html/ with diff percentage")
+	v := flag.Bool("verbose", false, "Verbose output")
 
 	flag.Parse()
+
+	verbose = *v
 
 	data, err := ioutil.ReadFile("targets.yml")
 	if err != nil {
@@ -118,6 +146,10 @@ func main() {
 		panic(err)
 	}
 
+	if verbose {
+		fmt.Printf("URLS to check: %+v\n", URLs)
+	}
+
 	var ignore URL
 	ignoreData, err := ioutil.ReadFile("ignore.yml")
 	if err == nil {
@@ -125,12 +157,18 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		if verbose {
+			fmt.Printf("URLS to ignore: %+v\n", ignore)
+		}
 		// Really ugly nested loops, but we need to stick to the YAML format giben by prometheus
 		for _, ign := range ignore {
 			for _, ignUrl := range ign.Targets {
 				for _, url := range URLs {
 					for l, urlTarget := range url.Targets {
 						if urlTarget == ignUrl {
+							if verbose {
+								fmt.Printf("Ignoring %s\n", urlTarget)
+							}
 							copy(url.Targets[l:], url.Targets[l+1:])
 							url.Targets[len(url.Targets)-1] = ""
 							url.Targets = url.Targets[:len(url.Targets)-1]
