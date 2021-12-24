@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -83,26 +82,6 @@ func recordMetrics(URLs URL, saveDiff bool) {
 					}
 					htmlNewStr := string(htmlNew)
 					htmlOldStr := string(htmlOld)
-					if htmlNewStr == htmlOldStr {
-						fmt.Printf("%s: %s\n", target, "Same")
-					}
-					//write string to file
-					fnew, err := os.Create("htmlNewStr.html")
-					if err != nil {
-						panic(err)
-					}
-					fnew.WriteString(htmlNewStr)
-					fnew.Sync()
-					fold, err := os.Create("htmlOldStr.html")
-					if err != nil {
-						panic(err)
-					}
-					fold.WriteString(htmlOldStr)
-					fold.Sync()
-
-					// if verbose {
-					// 	fmt.Printf("\nOld: %s\nNew: %s\n", htmlOldStr, htmlNewStr)
-					// }
 					diffs := dmp.DiffMain(htmlNewStr, htmlOldStr, false)
 					levenshteinDiff := float64(dmp.DiffLevenshtein(diffs))
 					len1 := float64(len(htmlNewStr))
@@ -146,9 +125,7 @@ func main() {
 		panic(err)
 	}
 
-	if verbose {
-		fmt.Printf("URLS to check: %+v\n", URLs)
-	}
+	fmt.Printf("URLS to check: %+v\n", URLs)
 
 	var ignore URL
 	ignoreData, err := ioutil.ReadFile("ignore.yml")
@@ -157,9 +134,9 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		if verbose {
-			fmt.Printf("URLS to ignore: %+v\n", ignore)
-		}
+
+		fmt.Printf("URLS to ignore: %+v\n", ignore)
+
 		// Really ugly nested loops, but we need to stick to the YAML format giben by prometheus
 		for _, ign := range ignore {
 			for _, ignUrl := range ign.Targets {
