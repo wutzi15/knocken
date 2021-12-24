@@ -106,6 +106,29 @@ func main() {
 		panic(err)
 	}
 
+	var ignore URL
+	ignoreData, err := ioutil.ReadFile("ignore.yml")
+	if err == nil {
+		err = yaml.Unmarshal(ignoreData, &ignore)
+		if err != nil {
+			panic(err)
+		}
+		// Really ugly nested loops, but we need to stick to the YAML format giben by prometheus
+		for _, ign := range ignore {
+			for _, ignUrl := range ign.Targets {
+				for _, url := range URLs {
+					for l, urlTarget := range url.Targets {
+						if urlTarget == ignUrl {
+							copy(url.Targets[l:], url.Targets[l+1:])
+							url.Targets[len(url.Targets)-1] = ""
+							url.Targets = url.Targets[:len(url.Targets)-1]
+						}
+					}
+				}
+			}
+		}
+	}
+
 	prometheus.MustRegister(statSame)
 	recordMetrics(URLs)
 
