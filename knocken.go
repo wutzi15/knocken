@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -63,6 +64,9 @@ func recordMetrics(URLs URL, saveDiff bool) {
 
 			for _, url := range URLs {
 				for _, target := range url.Targets {
+					if strings.TrimSpace(target) == "" {
+						continue
+					}
 					fmt.Println("Checking: " + target)
 					dmp := diffmatchpatch.New()
 					htmlNew, err := getHTML(target)
