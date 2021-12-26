@@ -1,2 +1,2 @@
 # knocken
-Checks a Website changes and provides an endpoint for prometheus
+***kocken*** is a tool that perioadically checks a website for changes and notifies you if there are any.
