@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -87,7 +88,7 @@ func recordMetrics(URLs URL, saveDiff bool) {
 					len1 := float64(len(htmlNewStr))
 					len2 := float64(len(htmlOldStr))
 					weightedLen := (len1 + len2) / 2.0
-					same := 1 - (levenshteinDiff / weightedLen)
+					same := math.Abs(1 - (levenshteinDiff / weightedLen))
 					if verbose {
 						fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
 					}
