@@ -23,7 +23,7 @@ type URL []struct {
 var (
 	statSame = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: "imflow",
+			Namespace: "knocken",
 			Subsystem: "knocken",
 			Name:      "same",
 			Help:      "Percentage of same HTML code on a website in the last 5 min.",
@@ -105,7 +105,6 @@ func recordMetrics(URLs URL, saveDiff bool, waitTime time.Duration) {
 }
 
 func main() {
-	// url := "https://imflow.me"
 	fmt.Println("Starting...")
 
 	saveDiff := flag.Bool("saveDiffs", false, "Keep diffs in ./html/ with diff percentage")
