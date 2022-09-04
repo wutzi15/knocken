@@ -1,9 +1,19 @@
-FROM golang:latest
+FROM golang:latest as builder
 
-WORKDIR /go/src/app
-COPY . .
+WORKDIR /app
+COPY go.mod go.sum knocken.go LICENSE .
 RUN go get -d -v ./...
 RUN go install -v ./...
-RUN go build knocken.go
+RUN CGO_ENABLED=0 GOOS=linux go build knocken.go
+RUN mkdir -p /app/html
 
-CMD ["/go/src/app/knocken"]
+FROM scratch
+
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+WORKDIR /app
+COPY --from=builder /app/html /app/html
+COPY --from=builder /app/knocken /app/knocken
+
+CMD ["/app/knocken", "-verbose"]

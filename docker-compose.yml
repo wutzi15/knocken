@@ -5,4 +5,6 @@ services:
     build: .
     ports:
       - 9101:9101
+    volumes:
+      - ./targets.yml:/app/targets.yml
     restart: always
