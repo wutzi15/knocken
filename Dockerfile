@@ -16,4 +16,4 @@ WORKDIR /app
 COPY --from=builder /app/html /app/html
 COPY --from=builder /app/knocken /app/knocken
 
-CMD ["/app/knocken", "-verbose"]
+CMD ["/app/knocken"]

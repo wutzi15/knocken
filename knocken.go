@@ -12,7 +12,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/wutzi15/levenshtein"
 	"gopkg.in/yaml.v2"
 )
 
@@ -70,7 +70,7 @@ func recordMetrics(URLs URL, saveDiff bool) {
 						continue
 					}
 					fmt.Println("Checking: " + target)
-					dmp := diffmatchpatch.New()
+					// dmp := diffmatchpatch.New()
 					htmlNew, err := getHTML(target)
 					if err != nil {
 						panic(err)
@@ -83,8 +83,8 @@ func recordMetrics(URLs URL, saveDiff bool) {
 					}
 					htmlNewStr := string(htmlNew)
 					htmlOldStr := string(htmlOld)
-					diffs := dmp.DiffMain(htmlNewStr, htmlOldStr, false)
-					levenshteinDiff := float64(dmp.DiffLevenshtein(diffs))
+					// diffs := levenshtein.Distance(htmlNewStr, htmlOldStr, false)
+					levenshteinDiff := float64(levenshtein.Distance(htmlNewStr, htmlOldStr))
 					len1 := float64(len(htmlNewStr))
 					len2 := float64(len(htmlOldStr))
 					weightedLen := (len1 + len2) / 2.0
