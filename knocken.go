@@ -55,7 +55,7 @@ func getContentOfFileIfExists(fileName string) ([]byte, error) {
 	return ioutil.ReadFile("./html/" + fileName)
 }
 
-func recordMetrics(URLs URL, saveDiff bool) {
+func recordMetrics(URLs URL, saveDiff bool, waitTime time.Duration) {
 	go func() {
 		for {
 			// Read file to byte array
@@ -99,7 +99,7 @@ func recordMetrics(URLs URL, saveDiff bool) {
 					statSame.WithLabelValues(target).Set(same)
 				}
 			}
-			time.Sleep(5 * time.Minute)
+			time.Sleep(waitTime)
 		}
 	}()
 }
@@ -110,10 +110,15 @@ func main() {
 
 	saveDiff := flag.Bool("saveDiffs", false, "Keep diffs in ./html/ with diff percentage")
 	v := flag.Bool("verbose", false, "Verbose output")
+	waitTimeStr := flag.String("waitTime", "5m", "Wait time")
 
 	flag.Parse()
 
 	verbose = *v
+	waitTime, err := time.ParseDuration(*waitTimeStr)
+	if err != nil {
+		panic(err)
+	}
 
 	data, err := ioutil.ReadFile("targets.yml")
 	if err != nil {
@@ -158,7 +163,7 @@ func main() {
 	}
 
 	prometheus.MustRegister(statSame)
-	recordMetrics(URLs, *saveDiff)
+	recordMetrics(URLs, *saveDiff, waitTime)
 
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(":9101", nil))
