@@ -58,12 +58,6 @@ func getContentOfFileIfExists(fileName string) ([]byte, error) {
 func recordMetrics(URLs URL, saveDiff bool, waitTime time.Duration) {
 	go func() {
 		for {
-			// Read file to byte array
-			// data, err := ioutil.ReadFile("targets.yml")
-			// if err != nil {
-			// 	panic(err)
-			// }
-
 			for _, url := range URLs {
 				for _, target := range url.Targets {
 					if strings.TrimSpace(target) == "" {
