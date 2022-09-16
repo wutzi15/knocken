@@ -40,7 +40,7 @@ func WriteFile(fileName string, data []byte) error {
 	return ioutil.WriteFile("./html/"+fileName, data, 0644)
 }
 
-func getContentOfFileIfExists(fileName string) ([]byte, error) {
+func GetContentOfFileIfExists(fileName string) ([]byte, error) {
 	if _, err := ioutil.ReadFile("./html/" + fileName); err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func RecordMetrics(URLs types.URL, saveDiff bool, waitTime time.Duration, statSa
 					if err != nil {
 						panic(err)
 					}
-					htmlOld, err := getContentOfFileIfExists(target)
+					htmlOld, err := GetContentOfFileIfExists(target)
 
 					WriteFile(target, htmlNew)
 					if err != nil {

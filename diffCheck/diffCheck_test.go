@@ -30,3 +30,18 @@ func TestWriteFile(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestGetContentOfFileIfExists(t *testing.T) {
+	err := diffCheck.WriteFile("test", []byte("test"))
+	defer os.Remove("./html/test")
+	if err != nil {
+		t.Error(err)
+	}
+	content, err := diffCheck.GetContentOfFileIfExists("test")
+	if err != nil {
+		t.Error(err)
+	}
+	if string(content) != "test" {
+		t.Errorf("Expected 'test' but got %s", content)
+	}
+}
