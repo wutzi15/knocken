@@ -5,12 +5,12 @@ import (
 	"io/ioutil"
 	"math"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/wutzi15/knocken/types"
+	myTypes "github.com/wutzi15/knocken/types"
 	"github.com/wutzi15/levenshtein"
 )
 
@@ -32,11 +32,12 @@ func GetHTML(url string) ([]byte, error) {
 func WriteFile(fileName string, data []byte) error {
 	//check if folder exists and create it if not
 	if _, err := ioutil.ReadDir("./html"); err != nil {
+		// fmt.Println("Creating folder ./html")
 		if err := os.Mkdir("./html", 0755); err != nil {
+			// fmt.Println("Error creating folder ./html", err)
 			return err
 		}
 	}
-
 	return ioutil.WriteFile("./html/"+fileName, data, 0644)
 }
 
@@ -47,26 +48,36 @@ func GetContentOfFileIfExists(fileName string) ([]byte, error) {
 	return ioutil.ReadFile("./html/" + fileName)
 }
 
-func RecordMetrics(URLs types.URL, saveDiff bool, waitTime time.Duration, statSame *prometheus.GaugeVec, verbose bool) {
+func RecordMetrics(config myTypes.MetricsConfig) {
 	go func() {
 		for {
-			for _, url := range URLs {
-				for _, target := range url.Targets {
+			for _, urls := range config.URLs {
+				for _, target := range urls.Targets {
 					if strings.TrimSpace(target) == "" {
 						continue
 					}
-					fmt.Println("Checking: " + target)
+
+					var toUrlToParse = target
+					if !strings.HasPrefix(target, "http") {
+						toUrlToParse = "https://" + target
+					}
+					myurl, err := url.ParseRequestURI(toUrlToParse)
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
+					hostname := myurl.Hostname()
 					// dmp := diffmatchpatch.New()
 					htmlNew, err := GetHTML(target)
 					if err != nil {
 						panic(err)
 					}
-					htmlOld, err := GetContentOfFileIfExists(target)
+					htmlOld, err := GetContentOfFileIfExists(hostname)
 
-					WriteFile(target, htmlNew)
 					if err != nil {
-						continue
+						fmt.Println("Error: " + err.Error())
 					}
+					WriteFile(hostname, htmlNew)
 					htmlNewStr := string(htmlNew)
 					htmlOldStr := string(htmlOld)
 					// diffs := levenshtein.Distance(htmlNewStr, htmlOldStr, false)
@@ -75,17 +86,20 @@ func RecordMetrics(URLs types.URL, saveDiff bool, waitTime time.Duration, statSa
 					len2 := float64(len(htmlOldStr))
 					weightedLen := (len1 + len2) / 2.0
 					same := math.Abs(1 - (levenshteinDiff / weightedLen))
-					if verbose {
+					if config.Verbose {
 						fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
 					}
-					if saveDiff {
-						WriteFile(fmt.Sprint(same)+"_"+target, htmlNew)
+					if config.SaveDiff {
+						WriteFile("same_"+hostname, []byte(fmt.Sprintf("%e", same)))
 					}
 					fmt.Println(same)
-					statSame.WithLabelValues(target).Set(same)
+					config.StatSame.WithLabelValues(target).Set(same)
 				}
 			}
-			time.Sleep(waitTime)
+			if config.Wg != nil {
+				config.Wg.Done()
+			}
+			time.Sleep(config.WaitTime)
 		}
 	}()
 }

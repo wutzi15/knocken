@@ -88,7 +88,15 @@ func main() {
 	}
 
 	prometheus.MustRegister(statSame)
-	diffcheck.RecordMetrics(URLs, *saveDiff, waitTime, statSame, verbose)
+	cfg := types.MetricsConfig{
+		URLs:     URLs,
+		SaveDiff: *saveDiff,
+		WaitTime: waitTime,
+		StatSame: statSame,
+		Verbose:  verbose,
+		Wg:       nil,
+	}
+	diffcheck.RecordMetrics(cfg)
 	// recordMetrics(URLs, *saveDiff, waitTime)
 
 	http.Handle("/metrics", promhttp.Handler())
