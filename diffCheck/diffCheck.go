@@ -13,8 +13,14 @@ import (
 	"github.com/wutzi15/levenshtein"
 )
 
-func getHTML(url string) ([]byte, error) {
-	resp, err := http.Get("https://" + url)
+func GetHTML(url string) ([]byte, error) {
+	var domain string
+	if strings.HasPrefix(url, "http") {
+		domain = url
+	} else {
+		domain = "https://" + url
+	}
+	resp, err := http.Get(domain)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +49,7 @@ func RecordMetrics(URLs types.URL, saveDiff bool, waitTime time.Duration, statSa
 					}
 					fmt.Println("Checking: " + target)
 					// dmp := diffmatchpatch.New()
-					htmlNew, err := getHTML(target)
+					htmlNew, err := GetHTML(target)
 					if err != nil {
 						panic(err)
 					}
