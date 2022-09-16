@@ -1,4 +1,4 @@
-module github.com/ImFlow/knocken
+module github.com/wutzi15/knocken
 
 go 1.17
 
