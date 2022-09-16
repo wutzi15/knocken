@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"math"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -28,7 +29,14 @@ func GetHTML(url string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func writeFile(fileName string, data []byte) error {
+func WriteFile(fileName string, data []byte) error {
+	//check if folder exists and create it if not
+	if _, err := ioutil.ReadDir("./html"); err != nil {
+		if err := os.Mkdir("./html", 0755); err != nil {
+			return err
+		}
+	}
+
 	return ioutil.WriteFile("./html/"+fileName, data, 0644)
 }
 
@@ -55,7 +63,7 @@ func RecordMetrics(URLs types.URL, saveDiff bool, waitTime time.Duration, statSa
 					}
 					htmlOld, err := getContentOfFileIfExists(target)
 
-					writeFile(target, htmlNew)
+					WriteFile(target, htmlNew)
 					if err != nil {
 						continue
 					}
@@ -71,7 +79,7 @@ func RecordMetrics(URLs types.URL, saveDiff bool, waitTime time.Duration, statSa
 						fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
 					}
 					if saveDiff {
-						writeFile(fmt.Sprint(same)+"_"+target, htmlNew)
+						WriteFile(fmt.Sprint(same)+"_"+target, htmlNew)
 					}
 					fmt.Println(same)
 					statSame.WithLabelValues(target).Set(same)
