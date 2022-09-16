@@ -1,7 +1,7 @@
 FROM golang:latest as builder
 
 WORKDIR /app
-COPY go.mod go.sum knocken.go LICENSE .
+COPY . .
 RUN go get -d -v ./...
 RUN go install -v ./...
 RUN CGO_ENABLED=0 GOOS=linux go build knocken.go
