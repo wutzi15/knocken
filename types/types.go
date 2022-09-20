@@ -19,3 +19,9 @@ type MetricsConfig struct {
 	Verbose  bool
 	Wg       *sync.WaitGroup
 }
+
+type KnockenConfig struct {
+	Verbose  bool
+	SaveDiff bool
+	WaitTime time.Duration
+}

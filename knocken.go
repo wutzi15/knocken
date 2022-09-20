@@ -10,6 +10,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/wutzi15/knocken/config"
 	diffcheck "github.com/wutzi15/knocken/diffCheck"
 	types "github.com/wutzi15/knocken/types"
 	"gopkg.in/yaml.v2"
@@ -32,6 +33,8 @@ var (
 
 func main() {
 	fmt.Println("Starting...")
+
+	config.SetUpConfig()
 
 	saveDiff := flag.Bool("saveDiffs", false, "Keep diffs in ./html/ with diff percentage")
 	v := flag.Bool("verbose", false, "Verbose output")
