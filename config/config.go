@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -16,8 +17,6 @@ func GetConfig() types.KnockenConfig {
 	viper.SetDefault("Ignore", "ignore.yml")
 	viper.SetDefault("SaveConfig", false)
 
-	// viper.SetConfigName(".env")
-	// viper.AddConfigPath(".")
 	viper.SetConfigFile(".env")
 	viper.SetConfigType("env")
 
@@ -29,28 +28,36 @@ func GetConfig() types.KnockenConfig {
 		fmt.Printf("Error reading config file, %s\n", err)
 	}
 
-	_ = pflag.Bool("SaveDiff", false, "Keep diffs in ./html/ with diff percentage")
-	_ = pflag.Bool("Verbose", false, "Verbose output")
-	_ = pflag.String("WaitTime", "5m", "Wait time")
-	_ = pflag.String("Targets", "targets.yml", "Targets file")
-	_ = pflag.String("Ignore", "ignore.yml", "Ignore file")
-	_ = pflag.Bool("SaveConfig", false, "Save config to .env")
+	flag := pflag.FlagSet{}
 
-	pflag.Parse()
-	viper.BindPFlags(pflag.CommandLine)
+	_ = flag.Bool("SaveDiff", false, "Keep diffs in ./html/ with diff percentage")
+	_ = flag.Bool("Verbose", false, "Verbose output")
+	_ = flag.String("WaitTime", "5m", "Wait time")
+	_ = flag.String("Targets", "targets.yml", "Targets file")
+	_ = flag.String("Ignore", "ignore.yml", "Ignore file")
+	_ = flag.Bool("SaveConfig", false, "Save config to .env")
+
+	flag.Parse(os.Args[1:])
+	viper.BindPFlags(&flag)
 
 	if viper.GetBool("SaveConfig") {
 		viper.WriteConfig()
 		viper.SafeWriteConfig()
 	}
-	fmt.Printf("WaitTime: %s\n", viper.GetDuration("WaitTime"))
 
-	return types.KnockenConfig{
+	config := types.KnockenConfig{
 		Verbose:  viper.GetBool("Verbose"),
 		SaveDiff: viper.GetBool("SaveDiff"),
 		WaitTime: viper.GetDuration("WaitTime"),
 		Targets:  viper.GetString("Targets"),
 		Ignore:   viper.GetString("Ignore"),
 	}
+
+	if viper.GetBool("Verbose") {
+		fmt.Println("Verbose output enabled")
+		fmt.Printf("Config: %+v\n", config)
+	}
+
+	return config
 
 }
