@@ -37,7 +37,7 @@ func main() {
 	verbose = config.Verbose
 	waitTime := config.WaitTime
 
-	data, err := ioutil.ReadFile("targets.yml")
+	data, err := ioutil.ReadFile(config.Targets)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +51,7 @@ func main() {
 	fmt.Printf("URLS to check: %+v\n", URLs)
 
 	var ignore types.URL
-	ignoreData, err := ioutil.ReadFile("ignore.yml")
+	ignoreData, err := ioutil.ReadFile(config.Ignore)
 	if err == nil {
 		err = yaml.Unmarshal(ignoreData, &ignore)
 		if err != nil {

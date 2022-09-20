@@ -24,4 +24,6 @@ type KnockenConfig struct {
 	Verbose  bool
 	SaveDiff bool
 	WaitTime time.Duration
+	Targets  string
+	Ignore   string
 }
