@@ -1,12 +1,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -34,19 +32,10 @@ var (
 func main() {
 	fmt.Println("Starting...")
 
-	config.SetUpConfig()
+	config := config.GetConfig()
 
-	saveDiff := flag.Bool("saveDiffs", false, "Keep diffs in ./html/ with diff percentage")
-	v := flag.Bool("verbose", false, "Verbose output")
-	waitTimeStr := flag.String("waitTime", "5m", "Wait time")
-
-	flag.Parse()
-
-	verbose = *v
-	waitTime, err := time.ParseDuration(*waitTimeStr)
-	if err != nil {
-		panic(err)
-	}
+	verbose = config.Verbose
+	waitTime := config.WaitTime
 
 	data, err := ioutil.ReadFile("targets.yml")
 	if err != nil {
@@ -93,7 +82,7 @@ func main() {
 	prometheus.MustRegister(statSame)
 	cfg := types.MetricsConfig{
 		URLs:     URLs,
-		SaveDiff: *saveDiff,
+		SaveDiff: config.SaveDiff,
 		WaitTime: waitTime,
 		StatSame: statSame,
 		Verbose:  verbose,
