@@ -44,7 +44,7 @@ func TestIgnoreTargets(t *testing.T) {
 	}
 	URLs = parsers.RemoveIgnoredTargets(URLs, ignore)
 	if len(URLs.Targets) != 1 {
-		t.Errorf("Expected 1 but got %+v", len(URLs.Targets))
+		t.Errorf("Expected 1 but got %+v", URLs.Targets)
 	}
 	if !contains(URLs.Targets, "escsoftware.de") {
 		t.Errorf("Expected to find escsoftware.de but did not %v", URLs.Targets)
