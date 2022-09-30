@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/pkg/profile"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/wutzi15/knocken/config"
@@ -31,6 +32,10 @@ var (
 func main() {
 	fmt.Println("Starting...")
 
+	// profile cpu and memory
+	defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+
+	// defer profile.Start(profile.CPUProfile).Stop()
 	config := config.GetConfig()
 
 	verbose = config.Verbose
@@ -55,6 +60,7 @@ func main() {
 	cfg := types.MetricsConfig{
 		URLs:     URLs,
 		SaveDiff: config.SaveDiff,
+		FastDiff: config.FastDiff,
 		WaitTime: waitTime,
 		StatSame: statSame,
 		Verbose:  verbose,

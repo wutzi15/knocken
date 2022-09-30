@@ -51,7 +51,6 @@ func GetContentOfFileIfExists(fileName string) ([]byte, error) {
 func RecordMetrics(config myTypes.MetricsConfig) {
 	go func() {
 		for {
-
 			for _, target := range config.URLs.Targets {
 				if strings.TrimSpace(target) == "" {
 					continue
@@ -73,28 +72,32 @@ func RecordMetrics(config myTypes.MetricsConfig) {
 					panic(err)
 				}
 				htmlOld, err := GetContentOfFileIfExists(hostname)
-
 				if err != nil {
 					fmt.Println("Error: " + err.Error())
 				}
 				WriteFile(hostname, htmlNew)
 				htmlNewStr := string(htmlNew)
 				htmlOldStr := string(htmlOld)
+				same := 0.0
 				// diffs := levenshtein.Distance(htmlNewStr, htmlOldStr, false)
-				levenshteinDiff := float64(levenshtein.Distance(htmlNewStr, htmlOldStr))
-				len1 := float64(len(htmlNewStr))
-				len2 := float64(len(htmlOldStr))
-				weightedLen := (len1 + len2) / 2.0
-				same := math.Abs(1 - (levenshteinDiff / weightedLen))
+				if !config.FastDiff {
+					levenshteinDiff := float64(levenshtein.Distance(htmlNewStr, htmlOldStr))
+					fmt.Println("levenshteinDiff: ", levenshteinDiff)
+					len1 := float64(len(htmlNewStr))
+					len2 := float64(len(htmlOldStr))
+					weightedLen := (len1 + len2) / 2.0
+					same = math.Abs(1 - (levenshteinDiff / weightedLen))
+				} else {
+					same = levenshtein.DistanceJW(htmlNewStr, htmlOldStr)
+				}
 				if config.Verbose {
-					fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
+					fmt.Printf("Target: %s\n\tSame: %f\n", target, same)
 				}
 				if config.SaveDiff {
 					WriteFile("same_"+hostname, []byte(fmt.Sprintf("%e", same)))
 				}
 				fmt.Println(same)
 				config.StatSame.WithLabelValues(target).Set(same)
-
 			}
 			if config.Wg != nil {
 				config.Wg.Done()

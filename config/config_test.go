@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,6 +35,7 @@ func TestGetConfig(t *testing.T) {
 func TestConfigFromEnv(t *testing.T) {
 	os.Setenv("KNOCKEN_VERBOSE", "true")
 	os.Setenv("KNOCKEN_SAVEDIFF", "true")
+	os.Setenv("KNOCKEN_FASTDIFF", "true")
 	os.Setenv("KNOCKEN_WAITTIME", "7m")
 	os.Setenv("KNOCKEN_TARGETS", "foo")
 	os.Setenv("KNOCKEN_CONTAINSTARGETS", "baz")
@@ -41,6 +43,7 @@ func TestConfigFromEnv(t *testing.T) {
 	defer func() {
 		os.Unsetenv("KNOCKEN_VERBOSE")
 		os.Unsetenv("KNOCKEN_SAVEDIFF")
+		os.Unsetenv("KNOCKEN_FASTDIFF")
 		os.Unsetenv("KNOCKEN_WAITTIME")
 		os.Unsetenv("KNOCKEN_TARGETS")
 		os.Unsetenv("KNOCKEN_CONTAINSTARGETS")
@@ -52,6 +55,9 @@ func TestConfigFromEnv(t *testing.T) {
 	}
 	if config.SaveDiff != true {
 		t.Errorf("Expected false but got %v", config.SaveDiff)
+	}
+	if config.FastDiff != true {
+		t.Errorf("Expected false but got %v", config.FastDiff)
 	}
 	dur, _ := time.ParseDuration("7m")
 	if config.WaitTime != dur {
@@ -85,7 +91,7 @@ func TestConfigWrite(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error reading env.sample")
 	}
-	if string(data) != string(expect) {
+	if strings.TrimSpace(string(data)) != strings.TrimSpace(string(expect)) {
 		t.Errorf("Expected %s but got %s", expect, data)
 	}
 }
@@ -100,6 +106,7 @@ func TestConfigReadEnv(t *testing.T) {
 		IGNORE=baz
 		SAVECONFIG=true
 		SAVEDIFF=false
+		FASTDIFF=true
 		TARGETS=nupf
 		CONTAINSTARGETS=foo
 		VERBOSE=false
@@ -112,6 +119,9 @@ func TestConfigReadEnv(t *testing.T) {
 	}
 	if config.SaveDiff != false {
 		t.Errorf("Expected false but got %v", config.SaveDiff)
+	}
+	if config.FastDiff != true {
+		t.Errorf("Expected false but got %v", config.FastDiff)
 	}
 	dur, _ := time.ParseDuration("7m")
 	if config.WaitTime != dur {

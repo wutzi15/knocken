@@ -17,12 +17,14 @@ type MetricsConfig struct {
 	WaitTime time.Duration
 	StatSame *prometheus.GaugeVec
 	Verbose  bool
+	FastDiff bool
 	Wg       *sync.WaitGroup
 }
 
 type KnockenConfig struct {
 	Verbose         bool
 	SaveDiff        bool
+	FastDiff        bool
 	WaitTime        time.Duration
 	Targets         string
 	ContainsTargets string

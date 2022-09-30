@@ -12,6 +12,7 @@ import (
 func GetConfig() types.KnockenConfig {
 	viper.SetDefault("Verbose", false)
 	viper.SetDefault("SaveDiff", false)
+	viper.SetDefault("FastDiff", false)
 	viper.SetDefault("WaitTime", "5m")
 	viper.SetDefault("Targets", "targets.yml")
 	viper.SetDefault("ContainsTargets", "containstargets.yml")
@@ -32,6 +33,7 @@ func GetConfig() types.KnockenConfig {
 	flag := pflag.FlagSet{}
 
 	_ = flag.Bool("SaveDiff", false, "Keep diffs in ./html/ with diff percentage")
+	_ = flag.Bool("FastDiff", false, "Use faster diff algorithm (Jaro-Winkler )")
 	_ = flag.Bool("Verbose", false, "Verbose output")
 	_ = flag.String("WaitTime", "5m", "Wait time")
 	_ = flag.String("Targets", "targets.yml", "Targets file")
@@ -50,6 +52,7 @@ func GetConfig() types.KnockenConfig {
 	config := types.KnockenConfig{
 		Verbose:         viper.GetBool("Verbose"),
 		SaveDiff:        viper.GetBool("SaveDiff"),
+		FastDiff:        viper.GetBool("FastDiff"),
 		WaitTime:        viper.GetDuration("WaitTime"),
 		Targets:         viper.GetString("Targets"),
 		ContainsTargets: viper.GetString("ContainsTargets"),
