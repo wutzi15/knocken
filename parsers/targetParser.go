@@ -41,3 +41,17 @@ func RemoveIgnoredTargets(URLs types.URL, ignore types.URL) types.URL {
 
 	return newURLs
 }
+
+func ParseContainsTargets(targets string) (types.ContainsTargets, error) {
+	data, err := ioutil.ReadFile(targets)
+	if err != nil {
+		return types.ContainsTargets{}, err
+	}
+
+	var URLs types.ContainsTargets
+	err = yaml.Unmarshal(data, &URLs)
+	if err != nil {
+		return types.ContainsTargets{}, err
+	}
+	return URLs, nil
+}

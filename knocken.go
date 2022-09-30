@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/wutzi15/knocken/config"
+	containscheck "github.com/wutzi15/knocken/containsCheck"
 	diffcheck "github.com/wutzi15/knocken/diffCheck"
 	"github.com/wutzi15/knocken/parsers"
 	types "github.com/wutzi15/knocken/types"
@@ -20,7 +21,19 @@ var (
 			Namespace: "knocken",
 			Subsystem: "knocken",
 			Name:      "same",
-			Help:      "Percentage of same HTML code on a website in the last 5 min.",
+			Help:      "Percentage of same HTML code on a website since the last checks.",
+		},
+		[]string{
+			"target",
+		},
+	)
+
+	statContains = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "knocken",
+			Subsystem: "knocken",
+			Name:      "contains",
+			Help:      "1 if the website contains the string 0 otherwise",
 		},
 		[]string{
 			"target",
@@ -51,12 +64,21 @@ func main() {
 	ignore, err := parsers.ParseTargets(config.Ignore)
 
 	if err == nil {
-
 		fmt.Printf("URLS to ignore: %+v\n", ignore)
 		URLs = parsers.RemoveIgnoredTargets(URLs, ignore)
 	}
 
+	contains, err := parsers.ParseContainsTargets(config.ContainsTargets)
+
+	if err == nil {
+		fmt.Printf("URLS to check for contains: %+v\n", contains)
+	}
+
+	fmt.Printf("URLS to check for contains: %+v\n", contains)
+
 	prometheus.MustRegister(statSame)
+	prometheus.MustRegister(statContains)
+
 	cfg := types.MetricsConfig{
 		URLs:     URLs,
 		SaveDiff: config.SaveDiff,
@@ -66,7 +88,21 @@ func main() {
 		Verbose:  verbose,
 		Wg:       nil,
 	}
-	diffcheck.RecordMetrics(cfg)
+	if config.RunDiff {
+		go func() {
+			diffcheck.RecordMetrics(cfg)
+		}()
+	}
+
+	containcfg := types.ContainsConfig{
+		WaitTime:     waitTime,
+		Verbose:      verbose,
+		StatContains: statContains,
+		Wg:           nil,
+	}
+	if config.RunContain {
+		containscheck.RunContain(contains, containcfg)
+	}
 	// recordMetrics(URLs, *saveDiff, waitTime)
 
 	http.Handle("/metrics", promhttp.Handler())

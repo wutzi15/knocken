@@ -30,6 +30,12 @@ func TestGetConfig(t *testing.T) {
 	if config.Ignore != "ignore.yml" {
 		t.Errorf("Expected 'ignore.yml' but got %v", config.Ignore)
 	}
+	if config.RunDiff != true {
+		t.Errorf("Expected 'true' but got %v", config.RunDiff)
+	}
+	if config.RunContain != true {
+		t.Errorf("Expected 'true' but got %v", config.RunContain)
+	}
 }
 
 func TestConfigFromEnv(t *testing.T) {
@@ -40,6 +46,8 @@ func TestConfigFromEnv(t *testing.T) {
 	os.Setenv("KNOCKEN_TARGETS", "foo")
 	os.Setenv("KNOCKEN_CONTAINSTARGETS", "baz")
 	os.Setenv("KNOCKEN_IGNORE", "bar")
+	os.Setenv("KNOCKEN_RUNDIFF", "false")
+	os.Setenv("KNOCKEN_RUNCONTAIN", "false")
 	defer func() {
 		os.Unsetenv("KNOCKEN_VERBOSE")
 		os.Unsetenv("KNOCKEN_SAVEDIFF")
@@ -48,6 +56,8 @@ func TestConfigFromEnv(t *testing.T) {
 		os.Unsetenv("KNOCKEN_TARGETS")
 		os.Unsetenv("KNOCKEN_CONTAINSTARGETS")
 		os.Unsetenv("KNOCKEN_IGNORE")
+		os.Unsetenv("KNOCKEN_RUNDIFF")
+		os.Unsetenv("KNOCKEN_RUNCONTAIN")
 	}()
 	config := config.GetConfig()
 	if config.Verbose != true {
@@ -72,7 +82,12 @@ func TestConfigFromEnv(t *testing.T) {
 	if config.Ignore != "bar" {
 		t.Errorf("Expected 'bar' but got %v", config.Ignore)
 	}
-
+	if config.RunDiff != false {
+		t.Errorf("Expected 'false' but got %v", config.RunDiff)
+	}
+	if config.RunContain != false {
+		t.Errorf("Expected 'false' but got %v", config.RunContain)
+	}
 }
 
 func TestConfigWrite(t *testing.T) {
@@ -111,6 +126,8 @@ func TestConfigReadEnv(t *testing.T) {
 		CONTAINSTARGETS=foo
 		VERBOSE=false
 		WAITTIME=7m
+		RUNDIFF=false
+		RUNCONTAIN=false
 	`
 	os.WriteFile(".env", []byte(out), 0644)
 	config := config.GetConfig()
@@ -135,5 +152,11 @@ func TestConfigReadEnv(t *testing.T) {
 	}
 	if config.Ignore != "baz" {
 		t.Errorf("Expected 'baz' but got %v", config.Ignore)
+	}
+	if config.RunDiff != false {
+		t.Errorf("Expected 'false' but got %v", config.RunDiff)
+	}
+	if config.RunContain != false {
+		t.Errorf("Expected 'false' but got %v", config.RunContain)
 	}
 }

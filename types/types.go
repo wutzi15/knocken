@@ -21,6 +21,13 @@ type MetricsConfig struct {
 	Wg       *sync.WaitGroup
 }
 
+type ContainsConfig struct {
+	WaitTime     time.Duration
+	Wg           *sync.WaitGroup
+	StatContains *prometheus.GaugeVec
+	Verbose      bool
+}
+
 type KnockenConfig struct {
 	Verbose         bool
 	SaveDiff        bool
@@ -29,4 +36,15 @@ type KnockenConfig struct {
 	Targets         string
 	ContainsTargets string
 	Ignore          string
+	RunDiff         bool
+	RunContain      bool
+}
+
+type ContainsTargetSlice []struct {
+	Domain  string `yaml:"domain"`
+	Contain string `yaml:"contain"`
+}
+
+type ContainsTargets struct {
+	Targets ContainsTargetSlice `yaml:"targets"`
 }

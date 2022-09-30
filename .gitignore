@@ -27,5 +27,6 @@
 
 targets.yml
 ignore.yml
+containstargets.yml
 html
 .env

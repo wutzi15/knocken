@@ -1,0 +1,5 @@
+targets:
+- domain: google.com
+  contain: google
+- domain: escsoftware.de
+  contain: escsoftware

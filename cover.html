@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/wutzi15/knocken/config/config.go (100.0%)</option>
+				
+				<option value="file1">github.com/wutzi15/knocken/diffCheck/diffCheck.go (83.0%)</option>
+				
+				<option value="file2">github.com/wutzi15/knocken/parsers/targetParser.go (75.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import (
+        "fmt"
+        "os"
+
+        "github.com/spf13/pflag"
+        "github.com/spf13/viper"
+        "github.com/wutzi15/knocken/types"
+)
+
+func GetConfig() types.KnockenConfig <span class="cov8" title="1">{
+        viper.SetDefault("Verbose", false)
+        viper.SetDefault("SaveDiff", false)
+        viper.SetDefault("WaitTime", "5m")
+        viper.SetDefault("Targets", "targets.yml")
+        viper.SetDefault("ContainsTargets", "containstargets.yml")
+        viper.SetDefault("Ignore", "ignore.yml")
+        viper.SetDefault("SaveConfig", false)
+
+        viper.SetConfigFile(".env")
+        viper.SetConfigType("env")
+
+        viper.SetEnvPrefix("knocken")
+        viper.AutomaticEnv()
+
+        err := viper.ReadInConfig()
+        if err != nil </span><span class="cov8" title="1">{
+                fmt.Printf("Error reading config file, %s\n", err)
+        }</span>
+
+        <span class="cov8" title="1">flag := pflag.FlagSet{}
+
+        _ = flag.Bool("SaveDiff", false, "Keep diffs in ./html/ with diff percentage")
+        _ = flag.Bool("Verbose", false, "Verbose output")
+        _ = flag.String("WaitTime", "5m", "Wait time")
+        _ = flag.String("Targets", "targets.yml", "Targets file")
+        _ = flag.String("ContainsTargets", "containstargets.yml", "Targets file for the contains check")
+        _ = flag.String("Ignore", "ignore.yml", "Ignore file")
+        _ = flag.Bool("SaveConfig", false, "Save config to .env")
+
+        flag.Parse(os.Args[1:])
+        viper.BindPFlags(&amp;flag)
+
+        if viper.GetBool("SaveConfig") </span><span class="cov8" title="1">{
+                viper.WriteConfig()
+                viper.SafeWriteConfig()
+        }</span>
+
+        <span class="cov8" title="1">config := types.KnockenConfig{
+                Verbose:         viper.GetBool("Verbose"),
+                SaveDiff:        viper.GetBool("SaveDiff"),
+                WaitTime:        viper.GetDuration("WaitTime"),
+                Targets:         viper.GetString("Targets"),
+                ContainsTargets: viper.GetString("ContainsTargets"),
+                Ignore:          viper.GetString("Ignore"),
+        }
+
+        if viper.GetBool("Verbose") </span><span class="cov8" title="1">{
+                fmt.Println("Verbose output enabled")
+                fmt.Printf("Config: %+v\n", config)
+        }</span>
+
+        <span class="cov8" title="1">return config</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package diffcheck
+
+import (
+        "fmt"
+        "io/ioutil"
+        "math"
+        "net/http"
+        "net/url"
+        "os"
+        "strings"
+        "time"
+
+        myTypes "github.com/wutzi15/knocken/types"
+        "github.com/wutzi15/levenshtein"
+)
+
+func GetHTML(url string) ([]byte, error) <span class="cov8" title="1">{
+        var domain string
+        if strings.HasPrefix(url, "http") </span><span class="cov8" title="1">{
+                domain = url
+        }</span> else<span class="cov0" title="0"> {
+                domain = "https://" + url
+        }</span>
+        <span class="cov8" title="1">resp, err := http.Get(domain)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer resp.Body.Close()
+        return ioutil.ReadAll(resp.Body)</span>
+}
+
+func WriteFile(fileName string, data []byte) error <span class="cov8" title="1">{
+        //check if folder exists and create it if not
+        if _, err := ioutil.ReadDir("./html"); err != nil </span><span class="cov8" title="1">{
+                // fmt.Println("Creating folder ./html")
+                if err := os.Mkdir("./html", 0755); err != nil </span><span class="cov0" title="0">{
+                        // fmt.Println("Error creating folder ./html", err)
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">return ioutil.WriteFile("./html/"+fileName, data, 0644)</span>
+}
+
+func GetContentOfFileIfExists(fileName string) ([]byte, error) <span class="cov8" title="1">{
+        if _, err := ioutil.ReadFile("./html/" + fileName); err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return ioutil.ReadFile("./html/" + fileName)</span>
+}
+
+func RecordMetrics(config myTypes.MetricsConfig) <span class="cov8" title="1">{
+        go func() </span><span class="cov8" title="1">{
+                for </span><span class="cov8" title="1">{
+                        for _, urls := range config.URLs </span><span class="cov8" title="1">{
+                                for _, target := range urls.Targets </span><span class="cov8" title="1">{
+                                        if strings.TrimSpace(target) == "" </span><span class="cov0" title="0">{
+                                                continue</span>
+                                        }
+
+                                        <span class="cov8" title="1">var toUrlToParse = target
+                                        if !strings.HasPrefix(target, "http") </span><span class="cov0" title="0">{
+                                                toUrlToParse = "https://" + target
+                                        }</span>
+                                        <span class="cov8" title="1">myurl, err := url.ParseRequestURI(toUrlToParse)
+                                        if err != nil </span><span class="cov0" title="0">{
+                                                fmt.Println(err)
+                                                continue</span>
+                                        }
+                                        <span class="cov8" title="1">hostname := myurl.Hostname()
+                                        // dmp := diffmatchpatch.New()
+                                        htmlNew, err := GetHTML(target)
+                                        if err != nil </span><span class="cov0" title="0">{
+                                                panic(err)</span>
+                                        }
+                                        <span class="cov8" title="1">htmlOld, err := GetContentOfFileIfExists(hostname)
+
+                                        if err != nil </span><span class="cov8" title="1">{
+                                                fmt.Println("Error: " + err.Error())
+                                        }</span>
+                                        <span class="cov8" title="1">WriteFile(hostname, htmlNew)
+                                        htmlNewStr := string(htmlNew)
+                                        htmlOldStr := string(htmlOld)
+                                        // diffs := levenshtein.Distance(htmlNewStr, htmlOldStr, false)
+                                        levenshteinDiff := float64(levenshtein.Distance(htmlNewStr, htmlOldStr))
+                                        len1 := float64(len(htmlNewStr))
+                                        len2 := float64(len(htmlOldStr))
+                                        weightedLen := (len1 + len2) / 2.0
+                                        same := math.Abs(1 - (levenshteinDiff / weightedLen))
+                                        if config.Verbose </span><span class="cov0" title="0">{
+                                                fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
+                                        }</span>
+                                        <span class="cov8" title="1">if config.SaveDiff </span><span class="cov8" title="1">{
+                                                WriteFile("same_"+hostname, []byte(fmt.Sprintf("%e", same)))
+                                        }</span>
+                                        <span class="cov8" title="1">fmt.Println(same)
+                                        config.StatSame.WithLabelValues(target).Set(same)</span>
+                                }
+                        }
+                        <span class="cov8" title="1">if config.Wg != nil </span><span class="cov8" title="1">{
+                                config.Wg.Done()
+                        }</span>
+                        <span class="cov8" title="1">time.Sleep(config.WaitTime)</span>
+                }
+        }()
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package parsers
+
+import (
+        "io/ioutil"
+
+        "github.com/wutzi15/knocken/types"
+        "gopkg.in/yaml.v2"
+)
+
+func ParseTargets(targets string) types.URL <span class="cov8" title="1">{
+        data, err := ioutil.ReadFile(targets)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+
+        <span class="cov8" title="1">var URLs types.URL
+        err = yaml.Unmarshal(data, &amp;URLs)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">return URLs</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

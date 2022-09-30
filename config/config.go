@@ -18,6 +18,8 @@ func GetConfig() types.KnockenConfig {
 	viper.SetDefault("ContainsTargets", "containstargets.yml")
 	viper.SetDefault("Ignore", "ignore.yml")
 	viper.SetDefault("SaveConfig", false)
+	viper.SetDefault("RunDiff", true)
+	viper.SetDefault("RunContain", true)
 
 	viper.SetConfigFile(".env")
 	viper.SetConfigType("env")
@@ -40,6 +42,8 @@ func GetConfig() types.KnockenConfig {
 	_ = flag.String("ContainsTargets", "containstargets.yml", "Targets file for the contains check")
 	_ = flag.String("Ignore", "ignore.yml", "Ignore file")
 	_ = flag.Bool("SaveConfig", false, "Save config to .env")
+	_ = flag.Bool("RunDiff", true, "Run the diff check")
+	_ = flag.Bool("RunContain", true, "Run the contains check")
 
 	flag.Parse(os.Args[1:])
 	viper.BindPFlags(&flag)
@@ -57,6 +61,8 @@ func GetConfig() types.KnockenConfig {
 		Targets:         viper.GetString("Targets"),
 		ContainsTargets: viper.GetString("ContainsTargets"),
 		Ignore:          viper.GetString("Ignore"),
+		RunDiff:         viper.GetBool("RunDiff"),
+		RunContain:      viper.GetBool("RunContain"),
 	}
 
 	if viper.GetBool("Verbose") {
