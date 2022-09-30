@@ -1,0 +1,28 @@
+
+
+name: CI
+
+on: [push, pull_request, workflow_dispatch]
+ 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Setup Go environment
+        uses: actions/setup-go@v3.3.0
+      - uses: actions/checkout@v3
+      - name: Install modules 
+        run: |
+          go get -d -v ./.. 
+          go install -v ./...
+      - name: Run the tests
+        run: go test -v -coverprofile cover.out ./...
+      - name: Upload coverage reports to Codecov
+        run: |
+          # Replace `linux` below with the appropriate OS
+          # Options are `alpine`, `linux`, `macos`, `windows`
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
