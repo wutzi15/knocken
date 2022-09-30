@@ -21,9 +21,10 @@ type MetricsConfig struct {
 }
 
 type KnockenConfig struct {
-	Verbose  bool
-	SaveDiff bool
-	WaitTime time.Duration
-	Targets  string
-	Ignore   string
+	Verbose         bool
+	SaveDiff        bool
+	WaitTime        time.Duration
+	Targets         string
+	ContainsTargets string
+	Ignore          string
 }

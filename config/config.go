@@ -14,6 +14,7 @@ func GetConfig() types.KnockenConfig {
 	viper.SetDefault("SaveDiff", false)
 	viper.SetDefault("WaitTime", "5m")
 	viper.SetDefault("Targets", "targets.yml")
+	viper.SetDefault("ContainsTargets", "containstargets.yml")
 	viper.SetDefault("Ignore", "ignore.yml")
 	viper.SetDefault("SaveConfig", false)
 
@@ -34,6 +35,7 @@ func GetConfig() types.KnockenConfig {
 	_ = flag.Bool("Verbose", false, "Verbose output")
 	_ = flag.String("WaitTime", "5m", "Wait time")
 	_ = flag.String("Targets", "targets.yml", "Targets file")
+	_ = flag.String("ContainsTargets", "containstargets.yml", "Targets file for the contains check")
 	_ = flag.String("Ignore", "ignore.yml", "Ignore file")
 	_ = flag.Bool("SaveConfig", false, "Save config to .env")
 
@@ -46,11 +48,12 @@ func GetConfig() types.KnockenConfig {
 	}
 
 	config := types.KnockenConfig{
-		Verbose:  viper.GetBool("Verbose"),
-		SaveDiff: viper.GetBool("SaveDiff"),
-		WaitTime: viper.GetDuration("WaitTime"),
-		Targets:  viper.GetString("Targets"),
-		Ignore:   viper.GetString("Ignore"),
+		Verbose:         viper.GetBool("Verbose"),
+		SaveDiff:        viper.GetBool("SaveDiff"),
+		WaitTime:        viper.GetDuration("WaitTime"),
+		Targets:         viper.GetString("Targets"),
+		ContainsTargets: viper.GetString("ContainsTargets"),
+		Ignore:          viper.GetString("Ignore"),
 	}
 
 	if viper.GetBool("Verbose") {

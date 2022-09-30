@@ -23,6 +23,9 @@ func TestGetConfig(t *testing.T) {
 	if config.Targets != "targets.yml" {
 		t.Errorf("Expected 'targets.yml' but got %v", config.Targets)
 	}
+	if config.ContainsTargets != "containstargets.yml" {
+		t.Errorf("Expected 'constainstargets.yml' but got %v", config.Targets)
+	}
 	if config.Ignore != "ignore.yml" {
 		t.Errorf("Expected 'ignore.yml' but got %v", config.Ignore)
 	}
@@ -33,12 +36,14 @@ func TestConfigFromEnv(t *testing.T) {
 	os.Setenv("KNOCKEN_SAVEDIFF", "true")
 	os.Setenv("KNOCKEN_WAITTIME", "7m")
 	os.Setenv("KNOCKEN_TARGETS", "foo")
+	os.Setenv("KNOCKEN_CONTAINSTARGETS", "baz")
 	os.Setenv("KNOCKEN_IGNORE", "bar")
 	defer func() {
 		os.Unsetenv("KNOCKEN_VERBOSE")
 		os.Unsetenv("KNOCKEN_SAVEDIFF")
 		os.Unsetenv("KNOCKEN_WAITTIME")
 		os.Unsetenv("KNOCKEN_TARGETS")
+		os.Unsetenv("KNOCKEN_CONTAINSTARGETS")
 		os.Unsetenv("KNOCKEN_IGNORE")
 	}()
 	config := config.GetConfig()
@@ -53,6 +58,9 @@ func TestConfigFromEnv(t *testing.T) {
 		t.Errorf("Expected 7m but got %v", config.WaitTime)
 	}
 	if config.Targets != "foo" {
+		t.Errorf("Expected 'foo' but got %v", config.Targets)
+	}
+	if config.ContainsTargets != "baz" {
 		t.Errorf("Expected 'foo' but got %v", config.Targets)
 	}
 	if config.Ignore != "bar" {
@@ -93,6 +101,7 @@ func TestConfigReadEnv(t *testing.T) {
 		SAVECONFIG=true
 		SAVEDIFF=false
 		TARGETS=nupf
+		CONTAINSTARGETS=foo
 		VERBOSE=false
 		WAITTIME=7m
 	`
@@ -111,8 +120,10 @@ func TestConfigReadEnv(t *testing.T) {
 	if config.Targets != "nupf" {
 		t.Errorf("Expected 'nupf' but got %v", config.Targets)
 	}
+	if config.ContainsTargets != "foo" {
+		t.Errorf("Expected 'foo' but got %v", config.ContainsTargets)
+	}
 	if config.Ignore != "baz" {
 		t.Errorf("Expected 'baz' but got %v", config.Ignore)
 	}
-
 }
