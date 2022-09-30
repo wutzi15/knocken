@@ -4,30 +4,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
 
 	myTypes "github.com/wutzi15/knocken/types"
+	"github.com/wutzi15/knocken/utils"
 	"github.com/wutzi15/levenshtein"
 )
-
-func GetHTML(url string) ([]byte, error) {
-	var domain string
-	if strings.HasPrefix(url, "http") {
-		domain = url
-	} else {
-		domain = "https://" + url
-	}
-	resp, err := http.Get(domain)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
-}
 
 func WriteFile(fileName string, data []byte) error {
 	//check if folder exists and create it if not
@@ -67,7 +52,7 @@ func RecordMetrics(config myTypes.MetricsConfig) {
 				}
 				hostname := myurl.Hostname()
 				// dmp := diffmatchpatch.New()
-				htmlNew, err := GetHTML(target)
+				htmlNew, err := utils.GetHTML(target)
 				if err != nil {
 					panic(err)
 				}
