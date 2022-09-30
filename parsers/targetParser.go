@@ -39,5 +39,5 @@ func RemoveIgnoredTargets(URLs types.URL, ignore types.URL) types.URL {
 		}
 	}
 
-	return URLs
+	return newURLs
 }
