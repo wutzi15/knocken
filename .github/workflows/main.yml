@@ -16,7 +16,7 @@ jobs:
         with:
           go-version: 1.19
       - name: Copy env
-        run: cp .env.sample .env
+        run: cp env.sample .env
       - name: Install modules
         run: |
           go get -d -v ./...
