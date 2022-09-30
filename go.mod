@@ -1,6 +1,6 @@
 module github.com/wutzi15/knocken
 
-go 1.17
+go 1.19
 
 require (
 	github.com/pkg/profile v1.6.0
