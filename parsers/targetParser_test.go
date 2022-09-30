@@ -49,5 +49,14 @@ func TestIgnoreTargets(t *testing.T) {
 	if !contains(URLs.Targets, "escsoftware.de") {
 		t.Errorf("Expected to find escsoftware.de but did not %v", URLs.Targets)
 	}
+}
 
+func TestIgnoreFail(t *testing.T) {
+	URLs, err := parsers.ParseTargets("foo.yml")
+	if len(URLs.Targets) != 0 {
+		t.Errorf("Expected 0 but got %+v", URLs.Targets)
+	}
+	if err == nil {
+		t.Errorf("Expected error parsing: %v", err)
+	}
 }
