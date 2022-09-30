@@ -15,8 +15,8 @@ jobs:
         uses: actions/setup-go@v3.3.0
         with:
           go-version: 1.19
-      - name: ls
-        run: ls -als && pwd
+      - name: Copy env
+        run: cp .env.example .env
       - name: Install modules
         run: |
           go get -d -v ./...
@@ -29,4 +29,4 @@ jobs:
           # Options are `alpine`, `linux`, `macos`, `windows`
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
-          ./codecov -t ${CODECOV_TOKEN}
+          ./codecov -t ${{ secrets.CODECOV_TOKEN }} -f cover.out
