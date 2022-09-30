@@ -51,50 +51,50 @@ func GetContentOfFileIfExists(fileName string) ([]byte, error) {
 func RecordMetrics(config myTypes.MetricsConfig) {
 	go func() {
 		for {
-			for _, urls := range config.URLs {
-				for _, target := range urls.Targets {
-					if strings.TrimSpace(target) == "" {
-						continue
-					}
 
-					var toUrlToParse = target
-					if !strings.HasPrefix(target, "http") {
-						toUrlToParse = "https://" + target
-					}
-					myurl, err := url.ParseRequestURI(toUrlToParse)
-					if err != nil {
-						fmt.Println(err)
-						continue
-					}
-					hostname := myurl.Hostname()
-					// dmp := diffmatchpatch.New()
-					htmlNew, err := GetHTML(target)
-					if err != nil {
-						panic(err)
-					}
-					htmlOld, err := GetContentOfFileIfExists(hostname)
-
-					if err != nil {
-						fmt.Println("Error: " + err.Error())
-					}
-					WriteFile(hostname, htmlNew)
-					htmlNewStr := string(htmlNew)
-					htmlOldStr := string(htmlOld)
-					// diffs := levenshtein.Distance(htmlNewStr, htmlOldStr, false)
-					levenshteinDiff := float64(levenshtein.Distance(htmlNewStr, htmlOldStr))
-					len1 := float64(len(htmlNewStr))
-					len2 := float64(len(htmlOldStr))
-					weightedLen := (len1 + len2) / 2.0
-					same := math.Abs(1 - (levenshteinDiff / weightedLen))
-					if config.Verbose {
-						fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
-					}
-					if config.SaveDiff {
-						WriteFile("same_"+hostname, []byte(fmt.Sprintf("%e", same)))
-					}
-					fmt.Println(same)
-					config.StatSame.WithLabelValues(target).Set(same)
+			for _, target := range config.URLs.Targets {
+				if strings.TrimSpace(target) == "" {
+					continue
 				}
+
+				var toUrlToParse = target
+				if !strings.HasPrefix(target, "http") {
+					toUrlToParse = "https://" + target
+				}
+				myurl, err := url.ParseRequestURI(toUrlToParse)
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+				hostname := myurl.Hostname()
+				// dmp := diffmatchpatch.New()
+				htmlNew, err := GetHTML(target)
+				if err != nil {
+					panic(err)
+				}
+				htmlOld, err := GetContentOfFileIfExists(hostname)
+
+				if err != nil {
+					fmt.Println("Error: " + err.Error())
+				}
+				WriteFile(hostname, htmlNew)
+				htmlNewStr := string(htmlNew)
+				htmlOldStr := string(htmlOld)
+				// diffs := levenshtein.Distance(htmlNewStr, htmlOldStr, false)
+				levenshteinDiff := float64(levenshtein.Distance(htmlNewStr, htmlOldStr))
+				len1 := float64(len(htmlNewStr))
+				len2 := float64(len(htmlOldStr))
+				weightedLen := (len1 + len2) / 2.0
+				same := math.Abs(1 - (levenshteinDiff / weightedLen))
+				if config.Verbose {
+					fmt.Printf("\nLevenshtein: %f\nWeightedLen: %f\nSame: %f\n", levenshteinDiff, weightedLen, same)
+				}
+				if config.SaveDiff {
+					WriteFile("same_"+hostname, []byte(fmt.Sprintf("%e", same)))
+				}
+				fmt.Println(same)
+				config.StatSame.WithLabelValues(target).Set(same)
+
 			}
 			if config.Wg != nil {
 				config.Wg.Done()

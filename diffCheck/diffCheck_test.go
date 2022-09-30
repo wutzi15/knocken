@@ -59,11 +59,8 @@ func TestRecordMetrics(t *testing.T) {
 	defer svr.Close()
 	strSlice := []string{svr.URL}
 
-	urls := types.URL{
-		{
-			Targets: strSlice,
-		},
-	}
+	var urls types.URL
+	urls.Targets = strSlice
 
 	statSame := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{

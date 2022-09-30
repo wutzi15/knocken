@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type URL []struct {
+type URL struct {
 	Targets []string `yaml:"targets"`
 }
 
