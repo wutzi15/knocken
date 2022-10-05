@@ -30,3 +30,28 @@ jobs:
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
           ./codecov -t ${{ secrets.CODECOV_TOKEN }} -f cover.out
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2.0.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses:  docker/metadata-action@v4.0.1
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/knocken
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3.1.1
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.tags }}
+            BUILD_DATE=${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/knocken:latest
+          cache-to: type=inline
+
