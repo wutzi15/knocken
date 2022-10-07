@@ -124,6 +124,8 @@ func main() {
 			Verbose:     verbose,
 			StatWpPosts: statwpPosts,
 			Wg:          nil,
+			SaveDiff:    config.SaveDiff,
+			Testing:     false,
 		}
 
 		wp, err := parsers.ParseTargets(config.WPTargets)

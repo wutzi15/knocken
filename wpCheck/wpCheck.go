@@ -1,6 +1,8 @@
 package wpcheck
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -42,6 +44,24 @@ func GetJSONContentOfFileIfExists(fileName string) (types.WPPosts, error) {
 	return ret, nil
 }
 
+func writeFile(filename string, data float64) error {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, binary.BigEndian, data)
+	if err != nil {
+		fmt.Println("binary.Write failed:", err)
+		return err
+	}
+	//check if folder exists and create it if not
+	if _, err := ioutil.ReadDir("./json"); err != nil {
+		// fmt.Println("Creating folder ./json")
+		if err := os.Mkdir("./json", 0755); err != nil {
+			// fmt.Println("Error creating folder ./json", err)
+			return err
+		}
+	}
+	return ioutil.WriteFile("./json/"+filename, buf.Bytes(), 0644)
+}
+
 func WPPostsFunc(targets types.URL, config types.WPPostsConfig) {
 	// var ret []bool
 	for _, target := range targets.Targets {
@@ -61,7 +81,15 @@ func WPPostsFunc(targets types.URL, config types.WPPostsConfig) {
 		}
 		hostname := myurl.Hostname()
 
-		dataNew, err := utils.GetJSON(hostname + "/wp-json/wp/v2/posts?_fields=author,id,date,title")
+		var dom = ""
+		if config.Testing {
+			dom = target
+		} else {
+			dom = target + "/wp-json/wp/v2/posts?_fields=author,id,date,title"
+		}
+
+		dataNew, err := utils.GetJSON(dom)
+
 		if err != nil {
 			fmt.Printf("Error getting json from %s: %s)\n", target, err)
 		}
@@ -74,23 +102,34 @@ func WPPostsFunc(targets types.URL, config types.WPPostsConfig) {
 		}
 		WriteJSONFile(hostname, Posts)
 
-		fmt.Printf("Length of old: %d, new: %d\n", len(Old), len(Posts))
+		if config.Verbose {
+			fmt.Printf("Length of old: %d, new: %d\n", len(Old), len(Posts))
+		}
 		timeInHours := config.WaitTime.Hours()
-		fmt.Printf("Waittime: %f\n", timeInHours)
+		if config.Verbose {
+			fmt.Printf("Waittime: %fh\n", timeInHours)
+		}
 		newPerHour := float64(len(Posts)-len(Old)) / timeInHours
-		fmt.Printf("New posts per hour: %f\n", newPerHour)
+		if config.Verbose {
+			fmt.Printf("New posts per hour: %f\n", newPerHour)
+		}
 		config.StatWpPosts.WithLabelValues(target).Set(newPerHour)
+		if config.SaveDiff {
+			writeFile(hostname+".diff", newPerHour)
+		}
+
 	}
+	time.Sleep(config.WaitTime)
 }
 
 func RunWPChecksPosts(targets types.URL, config types.WPPostsConfig) {
 	go func() {
 		for {
 			WPPostsFunc(targets, config)
+
 			if config.Wg != nil {
 				config.Wg.Done()
 			}
-			time.Sleep(config.WaitTime)
 		}
 	}()
 }

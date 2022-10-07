@@ -56,6 +56,8 @@ type WPPostsConfig struct {
 	WaitTime    time.Duration
 	StatWpPosts *prometheus.GaugeVec
 	Wg          *sync.WaitGroup
+	SaveDiff    bool
+	Testing     bool
 }
 
 // https://www.example.com/wp-json/wp/v2/posts?_fields=author,id,date,title
