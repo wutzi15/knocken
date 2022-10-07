@@ -3,8 +3,11 @@ version: "3"
 services:
   knocken:
     build: .
+    image: wutzi/knocken
     ports:
       - 9101:9101
     volumes:
       - ./targets.yml:/app/targets.yml
+      - ./ignore.yml:/app/ignore.yml
+      - ./.env:/app/.env
     restart: always
