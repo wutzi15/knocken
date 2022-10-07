@@ -39,6 +39,18 @@ var (
 			"target",
 		},
 	)
+
+	wpPosts = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "knocken",
+			Subsystem: "knocken",
+			Name:      "wpPosts",
+			Help:      "number of new posts per 1 hour on a wordpress website. ",
+		},
+		[]string{
+			"target",
+		},
+	)
 	verbose = false
 )
 

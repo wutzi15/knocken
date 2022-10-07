@@ -38,6 +38,7 @@ type KnockenConfig struct {
 	Ignore          string
 	RunDiff         bool
 	RunContain      bool
+	RunWPPosts      bool
 }
 
 type ContainsTargetSlice []struct {
@@ -47,4 +48,21 @@ type ContainsTargetSlice []struct {
 
 type ContainsTargets struct {
 	Targets ContainsTargetSlice `yaml:"targets"`
+}
+
+type WPPostsConfig struct {
+	Verbose     bool
+	WaitTime    time.Duration
+	URLs        URL
+	StatWpPosts *prometheus.GaugeVec
+}
+
+// https://www.example.com/wp-json/wp/v2/posts?_fields=author,id,date,title
+type WPPosts []struct {
+	ID    int    `json:"id"`
+	Date  string `json:"date"`
+	Title struct {
+		Rendered string `json:"rendered"`
+	} `json:"title"`
+	Author int `json:"author"`
 }

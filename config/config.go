@@ -20,6 +20,7 @@ func GetConfig() types.KnockenConfig {
 	viper.SetDefault("SaveConfig", false)
 	viper.SetDefault("RunDiff", true)
 	viper.SetDefault("RunContain", true)
+	viper.SetDefault("RunWPPosts", true)
 
 	viper.SetConfigFile(".env")
 	viper.SetConfigType("env")
@@ -44,6 +45,7 @@ func GetConfig() types.KnockenConfig {
 	_ = flag.Bool("SaveConfig", false, "Save config to .env")
 	_ = flag.Bool("RunDiff", true, "Run the diff check")
 	_ = flag.Bool("RunContain", true, "Run the contains check")
+	_ = flag.Bool("RunWPPosts", true, "Run the wordpress posts check")
 
 	flag.Parse(os.Args[1:])
 	viper.BindPFlags(&flag)
@@ -63,6 +65,7 @@ func GetConfig() types.KnockenConfig {
 		Ignore:          viper.GetString("Ignore"),
 		RunDiff:         viper.GetBool("RunDiff"),
 		RunContain:      viper.GetBool("RunContain"),
+		RunWPPosts:      viper.GetBool("RunWPPosts"),
 	}
 
 	if viper.GetBool("Verbose") {

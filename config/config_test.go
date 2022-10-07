@@ -36,6 +36,9 @@ func TestGetConfig(t *testing.T) {
 	if config.RunContain != true {
 		t.Errorf("Expected 'true' but got %v", config.RunContain)
 	}
+	if config.RunWPPosts != true {
+		t.Errorf("Expected 'true' but got %v", config.RunWPPosts)
+	}
 }
 
 func TestConfigFromEnv(t *testing.T) {
@@ -48,6 +51,7 @@ func TestConfigFromEnv(t *testing.T) {
 	os.Setenv("KNOCKEN_IGNORE", "bar")
 	os.Setenv("KNOCKEN_RUNDIFF", "false")
 	os.Setenv("KNOCKEN_RUNCONTAIN", "false")
+	os.Setenv("KNOCKEN_RUNWPPOSTS", "false")
 	defer func() {
 		os.Unsetenv("KNOCKEN_VERBOSE")
 		os.Unsetenv("KNOCKEN_SAVEDIFF")
@@ -58,6 +62,7 @@ func TestConfigFromEnv(t *testing.T) {
 		os.Unsetenv("KNOCKEN_IGNORE")
 		os.Unsetenv("KNOCKEN_RUNDIFF")
 		os.Unsetenv("KNOCKEN_RUNCONTAIN")
+		os.Unsetenv("KNOCKEN_RUNWPPOSTS")
 	}()
 	config := config.GetConfig()
 	if config.Verbose != true {
@@ -87,6 +92,9 @@ func TestConfigFromEnv(t *testing.T) {
 	}
 	if config.RunContain != false {
 		t.Errorf("Expected 'false' but got %v", config.RunContain)
+	}
+	if config.RunWPPosts != false {
+		t.Errorf("Expected 'false' but got %v", config.RunWPPosts)
 	}
 }
 
@@ -128,6 +136,7 @@ func TestConfigReadEnv(t *testing.T) {
 		WAITTIME=7m
 		RUNDIFF=false
 		RUNCONTAIN=false
+		RUNWPPOSTS=false
 	`
 	os.WriteFile(".env", []byte(out), 0644)
 	config := config.GetConfig()
@@ -158,5 +167,8 @@ func TestConfigReadEnv(t *testing.T) {
 	}
 	if config.RunContain != false {
 		t.Errorf("Expected 'false' but got %v", config.RunContain)
+	}
+	if config.RunWPPosts != false {
+		t.Errorf("Expected 'false' but got %v", config.RunWPPosts)
 	}
 }

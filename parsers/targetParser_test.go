@@ -1,6 +1,7 @@
 package parsers_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/wutzi15/knocken/parsers"
@@ -63,7 +64,7 @@ func TestIgnoreFail(t *testing.T) {
 
 func containsDomain(d mytypes.ContainsTargetSlice, s string) bool {
 	for _, v := range d {
-		if v.Domain == s {
+		if strings.Contains(v.Domain, s) {
 			return true
 		}
 	}
@@ -72,7 +73,7 @@ func containsDomain(d mytypes.ContainsTargetSlice, s string) bool {
 
 func containsContains(d mytypes.ContainsTargetSlice, s string) bool {
 	for _, v := range d {
-		if v.Contain == s {
+		if strings.Contains(v.Contain, s) {
 			return true
 		}
 	}
@@ -96,7 +97,7 @@ func TestContainsTargetParser(t *testing.T) {
 	if !containsContains(URLs.Targets, "google") {
 		t.Errorf("Expected to find google.com but did not %v", URLs.Targets)
 	}
-	if !containsContains(URLs.Targets, "escsoftware") {
+	if !containsContains(URLs.Targets, "Geschäftsführer") {
 		t.Errorf("Expected to find escsoftware.de but did not %v", URLs.Targets)
 	}
 }
