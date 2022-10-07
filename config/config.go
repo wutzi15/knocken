@@ -21,6 +21,7 @@ func GetConfig() types.KnockenConfig {
 	viper.SetDefault("RunDiff", true)
 	viper.SetDefault("RunContain", true)
 	viper.SetDefault("RunWPPosts", true)
+	viper.SetDefault("WPTargets", "wptargets.yml")
 
 	viper.SetConfigFile(".env")
 	viper.SetConfigType("env")
@@ -41,6 +42,7 @@ func GetConfig() types.KnockenConfig {
 	_ = flag.String("WaitTime", "5m", "Wait time")
 	_ = flag.String("Targets", "targets.yml", "Targets file")
 	_ = flag.String("ContainsTargets", "containstargets.yml", "Targets file for the contains check")
+	_ = flag.String("WPTargets", "wptargets.yml", "Targets file for the Wordpress check")
 	_ = flag.String("Ignore", "ignore.yml", "Ignore file")
 	_ = flag.Bool("SaveConfig", false, "Save config to .env")
 	_ = flag.Bool("RunDiff", true, "Run the diff check")
@@ -66,6 +68,7 @@ func GetConfig() types.KnockenConfig {
 		RunDiff:         viper.GetBool("RunDiff"),
 		RunContain:      viper.GetBool("RunContain"),
 		RunWPPosts:      viper.GetBool("RunWPPosts"),
+		WPTargets:       viper.GetString("WPTargets"),
 	}
 
 	if viper.GetBool("Verbose") {

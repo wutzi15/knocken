@@ -28,5 +28,10 @@
 targets.yml
 ignore.yml
 containstargets.yml
+wptargets.yml
+json
 html
 .env
+cpu.prof
+mem.prof
+cover.html

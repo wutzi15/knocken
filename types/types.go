@@ -39,6 +39,7 @@ type KnockenConfig struct {
 	RunDiff         bool
 	RunContain      bool
 	RunWPPosts      bool
+	WPTargets       string
 }
 
 type ContainsTargetSlice []struct {
@@ -53,8 +54,8 @@ type ContainsTargets struct {
 type WPPostsConfig struct {
 	Verbose     bool
 	WaitTime    time.Duration
-	URLs        URL
 	StatWpPosts *prometheus.GaugeVec
+	Wg          *sync.WaitGroup
 }
 
 // https://www.example.com/wp-json/wp/v2/posts?_fields=author,id,date,title
